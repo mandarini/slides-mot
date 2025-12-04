@@ -240,28 +240,25 @@ layout: center
 class: text-center
 ---
 
-# Why Mocks Fall Short
+# Why JavaScript Mocks Fall Short
 
 <div class="text-left max-w-2xl mx-auto text-xl space-y-4">
 
 - Mock behavior may not match reality
-- Doesn't catch integration issues
+- **Can't test RLS** - it's SQL evaluated by Postgres
+- **Can't test constraints** - enforced by the database
 - Requires maintenance when API changes
-- **Doesn't test RLS policies**
-- **Doesn't test database constraints**
 
 </div>
 
 <!--
-Here's what mocks CAN'T test:
+Here's what JavaScript mocks CAN'T test:
 
-Row Level Security - The cornerstone of Supabase security. RLS policies are SQL rules that run at the database level. You literally cannot mock this in JavaScript.
+Row Level Security - RLS policies are SQL rules evaluated by Postgres at query time. A JavaScript mock just returns fake data - it doesn't execute SQL.
 
 Database constraints - Foreign keys, unique constraints, check constraints - these are enforced by Postgres, not your mock.
 
 Real auth flows - JWT validation, session management, token refresh - mocks just return what you tell them to.
-
-I've seen production bugs that passed all mock tests because the mock didn't match reality. That's time and money wasted.
 -->
 
 ---
@@ -342,39 +339,6 @@ This is the same architecture used by companies running millions of requests. Yo
 
 ---
 
-# Why Supabase Architecture Matters
-
-```
-Your App → Kong API Gateway → Services → Postgres
-                ↓
-         ┌──────┴──────┐
-         │  PostgREST  │ ← Auto-generated REST API
-         │  GoTrue     │ ← Authentication
-         │  Realtime   │ ← WebSockets
-         │  Storage    │ ← S3-compatible files
-         │  Functions  │ ← Edge Functions (Deno)
-         └─────────────┘
-```
-
-**Everything flows through Postgres** = Test Postgres, test everything
-
-<!--
-Let me explain WHY Supabase testing works so well. It's the architecture.
-
-Everything flows through Postgres. This is intentional. Supabase isn't trying to be clever - it's using the most battle-tested database in existence.
-
-PostgREST reads your schema and generates REST APIs automatically
-GoTrue stores users in auth.users - a Postgres table you can query
-Storage stores file metadata in Postgres with RLS
-Realtime watches Postgres WAL for changes
-
-Because everything is Postgres, you test everything by testing Postgres. And Postgres has pgTAP - a mature testing framework.
-
-This is why the local stack works identically to production - it's the same database, same services, same Docker images.
--->
-
----
-
 # Local Development Benefits
 
 <div class="text-xl space-y-6">
@@ -418,6 +382,26 @@ The key insight: the local environment IS the production environment, just runni
 
 ---
 
+# "Can't I Just Use Docker + Postgres?"
+
+**Yes!** RLS and pgTAP work with any Postgres.
+
+**What Supabase adds:**
+
+- `supabase start` → Full stack in one command
+- `supabase test db` → pgTAP with nice output
+- `auth.uid()` → Pre-built JWT helper
+- Auth, Storage, Realtime → Pre-configured
+- Production hosting when you're ready
+
+<!--
+This is an honest question and deserves an honest answer. Yes, you could set up Docker + Postgres + pgTAP + your own auth system + your own JWT helpers.
+
+Supabase just gives you that stack pre-integrated with a nice CLI. The value is convenience and production-readiness, not magic features.
+-->
+
+---
+
 # Two Testing Approaches
 
 | Approach | Tool | Isolation | Speed |
@@ -448,57 +432,50 @@ Use pgTAP for security logic (RLS, permissions). Use application tests for end-t
 
 ---
 
-# pgTAP - What Is It?
+# pgTAP - A Postgres Testing Framework
 
-> "pgTAP is a unit testing framework for Postgres that allows testing:
-> - Database structure: tables, columns, constraints
-> - Row Level Security (RLS) policies
-> - Functions and procedures
-> - Data integrity"
+> pgTAP is a **PostgreSQL tool** (since 2008) - works with any Postgres database.
 
-<div class="mt-8">
+Supabase makes it easy: `supabase test db`
+
+<div class="mt-6">
 
 **Think of it as Jest/Vitest but for SQL**
+
+- Test database structure, RLS policies, functions
+- Tests run inside Postgres in transactions
+- Automatic rollback = perfect isolation
 
 </div>
 
 <!--
-pgTAP has been around since 2008. It's battle-tested, mature, and specifically designed for Postgres.
+pgTAP has been around since 2008. It's not a Supabase thing - it works with any Postgres database.
 
-Think of it as Jest/Vitest but for SQL. You write tests in SQL, they run in Postgres, and you get TAP output (Test Anything Protocol).
+What Supabase adds: the supabase test db command that runs pgTAP tests with nice output formatting.
 
-Why this matters for Supabase: RLS policies are the security layer. They determine who can see what data. You CANNOT properly test RLS from outside the database - you need to test at the database level.
-
-pgTAP lets you:
-- Create test users
-- Switch user contexts (simulate being different users)
-- Assert what each user can/cannot see
-- All in milliseconds, with automatic cleanup
+Why this matters: RLS policies are SQL evaluated by Postgres. You CANNOT properly test RLS from JavaScript - you need to test at the database level. pgTAP lets you do that.
 -->
 
 ---
 
-# Row Level Security - The Killer Feature
+# Row Level Security - A Postgres Feature
 
-> "Row Level Security (RLS) is incredibly powerful and flexible, allowing you to write complex SQL rules that fit your unique business needs."
+> RLS is a **PostgreSQL feature**. Supabase makes it easy to use with `auth.uid()` and client SDKs.
 
 ### Why RLS changes everything:
 
 - Security at the **database level**, not application level
 - Works with **any client** - REST, GraphQL, direct SQL
 - **Defense in depth** - even if your API is compromised
-- **You can't mock it** - it's SQL evaluated by Postgres
 
 <!--
-This is why testing with a real backend matters. RLS is the crown jewel of Supabase security.
+RLS is a core PostgreSQL feature - not something Supabase invented. What Supabase adds is convenience: the auth.uid() helper function that extracts the user ID from JWTs, and client SDKs that handle authentication.
 
 Traditional approach: Your API checks permissions, then queries the database. Problem: Every API endpoint is a potential security hole.
 
-Supabase approach: RLS policies enforce permissions AT THE DATABASE. The API doesn't need to know about permissions - Postgres handles it.
+With RLS: Policies enforce permissions AT THE DATABASE. The API doesn't need to know about permissions - Postgres handles it.
 
 The policy using ((select auth.uid()) = user_id) means: 'Only return rows where the user_id matches the authenticated user's ID.' This runs on EVERY query. You can't bypass it.
-
-This is why mocks fail. A mock doesn't evaluate auth.uid(). It doesn't enforce the policy. It just returns fake data. You need the real database to test real security.
 -->
 
 ---
@@ -860,16 +837,15 @@ select tests.rls_enabled('public');
 
 ---
 
-# Comparison Table
+# Comparison: JS Mocks vs Real Database
 
-| Aspect | Mocks | Real Backend |
-|--------|-------|--------------|
+| Aspect | JS Mocks | Real Postgres |
+|--------|----------|---------------|
 | RLS Testing | No | **Yes** |
 | Database Constraints | No | **Yes** |
 | Auth Flows | Simulated | **Real** |
 | Integration Issues | Missed | **Caught** |
 | Maintenance | High | **Low** |
-| Production Parity | No | **Yes** |
 | Speed | Fast | **Also Fast** |
 
 ---
@@ -880,16 +856,15 @@ layout: center
 
 <div class="text-left max-w-2xl">
 
-1. **Supabase makes real backend testing practical**
-   - Full stack runs locally with `supabase start`
-   - Fast and free
+1. **RLS and pgTAP are Postgres features**
+   - Supabase makes them easy with great tooling
 
 2. **Two complementary approaches**
-   - pgTAP for database-level (milliseconds, transactional)
+   - pgTAP for database-level (milliseconds)
    - Application tests for end-to-end
 
-3. **CI/CD ready out of the box**
-   - GitHub Actions support via `supabase/setup-cli`
+3. **Supabase CLI = convenience**
+   - `supabase start`, `supabase test db`
 
 4. **Stop mocking, start testing for real**
 
@@ -918,6 +893,34 @@ layout: center
 
 </div>
 </div>
+
+---
+
+# Live Demo: Testing Project
+
+```
+demo-testing/
+├── supabase/
+│   ├── migrations/   # Schema + RLS policies
+│   └── tests/        # pgTAP tests
+├── src/tests/        # Vitest application tests
+└── package.json
+```
+
+**Two test commands:**
+
+```bash
+npm run test:db   # pgTAP (database-level)
+npm test          # Vitest (application-level)
+```
+
+<!--
+Let me show you a real project structure. This is the demo-testing project - a simple todos app with RLS.
+
+The migrations folder has our schema and RLS policies. The tests folder has pgTAP tests that run inside Postgres. And src/tests has Vitest tests that call the real API.
+
+Two commands: test:db for database tests, test for application tests.
+-->
 
 ---
 layout: center
