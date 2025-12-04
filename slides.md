@@ -76,7 +76,7 @@ class: text-center
 
 # Build in a Weekend. Scale to Millions.
 
-> "Supabase is open source. We choose open source tools which are scalable and make them simple to use."
+> "Supabase is open source."
 
 ### What is Supabase?
 
