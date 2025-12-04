@@ -291,16 +291,7 @@ These same Docker images run in production. Same code. Same behavior. That's pro
 
 # What You Get Locally
 
-```
-Started supabase local development setup.
-
-         API URL: http://localhost:54321
-          DB URL: postgresql://postgres:postgres@localhost:54322/postgres
-      Studio URL: http://localhost:54323
-     Mailpit URL: http://localhost:54324
-   Publishable Key: sb_publishable_...
-        Secret Key: sb_secret_...
-```
+<img src="/images/cli-supa.png" alt="Supabase CLI Screenshot" class="mx-auto my-8 rounded-lg shadow-lg max-h-full" />
 
 <!--
 Look at what you get! This isn't a toy - it's a full backend. The keys work exactly like in production. Your client code doesn't change between local and production - just the URL.
