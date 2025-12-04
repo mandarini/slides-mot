@@ -931,7 +931,7 @@ layout: center
 class: text-center
 ---
 
-# The Demo
+# Bonus demo
 
 ## Cookie Catcher Game
 
@@ -948,7 +948,7 @@ class: text-center
 </div>
 
 <div class="mt-8 text-gray-600">
-<em>Live link will be shared later</em>
+<em></em>
 </div>
 
 <!--
@@ -962,7 +962,7 @@ class: text-center
 
 # Let's Play Together!
 
-## Cookie Catcher - Live Demo
+## Cookie Catcher Game
 
 <div class="text-6xl mb-8">🎮</div>
 
@@ -988,9 +988,9 @@ class: text-center
 
 <div class="text-xl space-y-4">
 
-## [ngdemo-sb.netlify.app](https://ngdemo-sb.netlify.app)
-
-**i can has teh codez:** [github.com/mandarini/ac-demo-sb](https://github.com/mandarini/ac-demo-sb)
+* https://github.com/mandarini/demo-testing-supabase
+* https://slides-mot.netlify.app
+* https://github.com/mandarini/ac-demo-sb
 
 </div>
 
