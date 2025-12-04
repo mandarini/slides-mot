@@ -540,9 +540,9 @@ Pro tip from the docs: Create a 000-setup.test.sql file that installs shared ext
 
 ---
 
-# pgTAP Test - Full Example
+# pgTAP Test - Setup
 
-```sql {all|1-3|5-8|10-14|16-17|19-23|25-29|31}
+```sql
 begin;
 create extension if not exists pgtap with schema extensions;
 select plan(4);
@@ -557,19 +557,33 @@ insert into public.todos (task, user_id) values
   ('User 1 Task 1', '123e4567-e89b-12d3-a456-426614174000'),
   ('User 1 Task 2', '123e4567-e89b-12d3-a456-426614174000'),
   ('User 2 Task 1', '987fcdeb-51a2-43d7-9012-345678901234');
+```
 
+<!--
+begin; starts a transaction - everything happens in isolation.
+
+select plan(4); tells pgTAP we're running 4 tests.
+
+We insert test users directly into auth.users - only possible in tests!
+-->
+
+---
+
+# pgTAP Test - Assertions
+
+```sql
 -- Test as User 1
 set local role authenticated;
 set local request.jwt.claim.sub = '123e4567-e89b-12d3-a456-426614174000';
 
--- Test 1: User 1 should only see their own todos
+-- User 1 should only see their own todos
 select results_eq(
   'select count(*) from todos',
   ARRAY[2::bigint],
   'User 1 should only see their 2 todos'
 );
 
--- Switch to User 2
+-- Switch to User 2 and test...
 set local request.jwt.claim.sub = '987fcdeb-51a2-43d7-9012-345678901234';
 
 select * from finish();
@@ -577,23 +591,11 @@ rollback;
 ```
 
 <!--
-Let's break this down - this is a complete RLS test:
+set local role authenticated - simulates an authenticated user.
 
-1. begin; - Start a transaction. Everything happens in isolation.
+set local request.jwt.claim.sub - sets which user we're pretending to be. This is how auth.uid() knows who's making the request.
 
-2. select plan(4); - Tell pgTAP we're running 4 tests.
-
-3. Insert test users - We're inserting directly into auth.users. Only possible in tests!
-
-4. set local role authenticated; - This is KEY. We're simulating an authenticated user.
-
-5. set local request.jwt.claim.sub = '...' - We're setting which user we're pretending to be. This is how auth.uid() knows who's making the request.
-
-6. Test assertions - results_eq checks query results, lives_ok checks SQL doesn't error, results_ne checks inequality.
-
-7. rollback; - Undo everything. The database is clean for the next test.
-
-This runs in MILLISECONDS. No network. No cleanup. Just pure SQL speed.
+rollback - undo everything. Database is clean for next test.
 -->
 
 ---
@@ -914,6 +916,8 @@ npm run test:db   # pgTAP (database-level)
 npm test          # Vitest (application-level)
 ```
 
+**Code:** [github.com/mandarini/demo-testing-supabase](https://github.com/mandarini/demo-testing-supabase)
+
 <!--
 Let me show you a real project structure. This is the demo-testing project - a simple todos app with RLS.
 
@@ -1006,7 +1010,7 @@ That's how you stop mocking and start testing with real Supabase backends. The c
 
 <style>
 * {
-  font-family: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  font-family: 'Roboto', 'Helvetica Neue', sans-serif;
 }
 
 h1 {
