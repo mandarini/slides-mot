@@ -231,9 +231,18 @@ class: text-center
 
 > "Testing is a critical part of database development, especially when working with features like Row Level Security (RLS) policies."
 
-<div class="mt-8 text-left max-w-2xl mx-auto">
+<!--
+Let's be honest - mocks are lies we tell ourselves. They make tests pass, but they don't catch real bugs.
+-->
 
-### Why mocks fall short:
+---
+layout: center
+class: text-center
+---
+
+# Why Mocks Fall Short
+
+<div class="text-left max-w-2xl mx-auto text-xl space-y-4">
 
 - Mock behavior may not match reality
 - Doesn't catch integration issues
@@ -244,7 +253,7 @@ class: text-center
 </div>
 
 <!--
-Let's be honest - mocks are lies we tell ourselves. They make tests pass, but they don't catch real bugs. Here's what mocks CAN'T test:
+Here's what mocks CAN'T test:
 
 Row Level Security - The cornerstone of Supabase security. RLS policies are SQL rules that run at the database level. You literally cannot mock this in JavaScript.
 
@@ -296,7 +305,15 @@ Started supabase local development setup.
         Secret Key: sb_secret_...
 ```
 
-<div class="grid grid-cols-2 gap-8 mt-4">
+<!--
+Look at what you get! This isn't a toy - it's a full backend. The keys work exactly like in production. Your client code doesn't change between local and production - just the URL.
+-->
+
+---
+
+# Full Stack Included
+
+<div class="grid grid-cols-2 gap-12 text-xl">
 <div>
 
 - **Postgres** - Real database, not a mock
@@ -315,14 +332,10 @@ Started supabase local development setup.
 </div>
 
 <!--
-Look at what you get! This isn't a toy - it's a full backend:
-
 A real Postgres database - with pgvector, PostGIS, and 50+ extensions available
 Real authentication - sign up, sign in, OAuth, magic links - it all works
 Mailpit - catches all emails locally so you can test password resets, magic links, confirmations
 Studio - a full visual dashboard to inspect your data, run SQL, manage users
-
-The anon key and service_role key work exactly like in production. Your client code doesn't change between local and production - just the URL.
 
 This is the same architecture used by companies running millions of requests. You're testing against production-grade infrastructure.
 -->
@@ -364,40 +377,38 @@ This is why the local stack works identically to production - it's the same data
 
 # Local Development Benefits
 
-<div class="grid grid-cols-2 gap-8">
-<div>
+<div class="text-xl space-y-6">
 
-1. **Faster development**
-   - Make changes and see results instantly
+1. **Faster development** - Make changes and see results instantly
 
-2. **Offline work**
-   - Continue development without internet
+2. **Offline work** - Continue development without internet
 
-3. **Cost-effective**
-   - Local development is free
+3. **Cost-effective** - Local development is free
 
-</div>
-<div>
-
-4. **Enhanced privacy**
-   - Sensitive data stays on your machine
-
-5. **Easy testing**
-   - Experiment without affecting production
-   - Reset with `supabase db reset`
-
-</div>
 </div>
 
 <!--
-Beyond testing, here's why local development with Supabase is a game-changer:
-
 Speed - No network latency. Queries return in milliseconds. Hot reload your migrations.
 
 Offline - On a plane? No wifi? Still productive. Your whole backend runs locally.
 
 Free - No usage limits locally. Spin up 10 projects, run thousands of tests, costs nothing.
+-->
 
+---
+
+# Local Development Benefits (cont.)
+
+<div class="text-xl space-y-6">
+
+4. **Enhanced privacy** - Sensitive data stays on your machine
+
+5. **Easy testing** - Experiment without affecting production
+   - Reset with `supabase db reset`
+
+</div>
+
+<!--
 Privacy - Building something with sensitive data? It never leaves your machine during development.
 
 Experimentation - Try crazy things. Break stuff. Reset with supabase db reset. No consequences.
@@ -800,23 +811,27 @@ jobs:
 
 ---
 
-# Best Practices
-
-<div class="grid grid-cols-2 gap-8">
-<div>
+# Best Practices: Test Data
 
 ### Test Data Setup
 - Use `begin` and `rollback` for isolation
 - Create realistic test data
 - Test with different user roles
 
-</div>
+---
+
+# Best Practices: RLS & CI/CD
+
+<div class="grid grid-cols-2 gap-12">
 <div>
 
 ### RLS Policy Testing
 - Test CRUD operations
-- Test with anonymous AND authenticated users
+- Test with anon AND authenticated
 - **Always test negative cases**
+
+</div>
+<div>
 
 ### CI/CD Integration
 - Run tests on every PR
@@ -987,6 +1002,10 @@ That's how you stop mocking and start testing with real Supabase backends. The c
 -->
 
 <style>
+* {
+  font-family: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+}
+
 h1 {
   background-color: #2B90B6;
   background-image: linear-gradient(45deg, #4EC5D4 10%, #146b8c 20%);
