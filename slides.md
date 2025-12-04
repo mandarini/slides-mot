@@ -51,6 +51,8 @@ class: text-center
 - **GDE** for Angular & Maps
 
 ## psyber.city - @psyber.city
+## .
+## @psybercity
 
 </div>
 <div>
@@ -76,14 +78,15 @@ class: text-center
 
 # Build in a Weekend. Scale to Millions.
 
-> "Supabase is open source."
-
 ### What is Supabase?
+
+Production‑ready Postgres backend with integrated services
 
 <div class="grid grid-cols-2 gap-8 mt-8 text-left">
 <div>
 
-- **The open-source Firebase alternative** built on Postgres
+
+- **The open-source Firebase alternative**
 - Everything you need to build and scale apps
 
 </div>
