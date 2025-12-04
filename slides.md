@@ -677,7 +677,7 @@ describe('Todos RLS', () => {
 
   const supabase = createClient(
     process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!
+    process.env.SUPABASE_PUBLISHABLE_KEY!  // or SUPABASE_ANON_KEY
   )
 ```
 
@@ -689,7 +689,7 @@ describe('Todos RLS', () => {
   beforeAll(async () => {
     const adminSupabase = createClient(
       process.env.SUPABASE_URL!,
-      process.env.SERVICE_ROLE_KEY!
+      process.env.SUPABASE_SECRET_KEY!  // or SERVICE_ROLE_KEY
     )
 
     // Create test users with unique IDs
